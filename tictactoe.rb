@@ -1,28 +1,28 @@
 
 class Board
-  attr_accessor :coordinate_hash
+  attr_accessor :board_hash
   def initialize
-    @coordinate_hash = {
+    @board_hash = {
     "a1" => "[ ]", "a2" => "[ ]", "a3" => "[ ]",
     "b1" => "[ ]", "b2" => "[ ]", "b3" => "[ ]",
     "c1" => "[ ]", "c2" => "[ ]", "c3" => "[ ]"
     }
   end
   
-  def generate_board
+  def display_board
     puts (
       "
       . 1  2  3
-      A#{@coordinate_hash["a1"]}#{@coordinate_hash["a2"]}#{@coordinate_hash["a3"]}
-      B#{@coordinate_hash["b1"]}#{@coordinate_hash["b2"]}#{@coordinate_hash["b3"]}
-      C#{@coordinate_hash["c1"]}#{@coordinate_hash["c2"]}#{@coordinate_hash["c3"]}
+      A#{@board_hash["a1"]}#{@board_hash["a2"]}#{@board_hash["a3"]}
+      B#{@board_hash["b1"]}#{@board_hash["b2"]}#{@board_hash["b3"]}
+      C#{@board_hash["c1"]}#{@board_hash["c2"]}#{@board_hash["c3"]}
       "
     )
   end
 
   def move_made(player_coordinate, player_mark)
-    if @coordinate_hash.any? { |key, item| player_coordinate == key && item == "[ ]" }
-      @coordinate_hash[player_coordinate] = "[#{player_mark}]"
+    if @board_hash.any? { |key, item| player_coordinate == key && item == "[ ]" }
+      @board_hash[player_coordinate] = "[#{player_mark}]"
       return true
     else
       return false
@@ -31,18 +31,18 @@ class Board
 
   def winner_check(mark)
     win_array = [
-      [@coordinate_hash["a1"], @coordinate_hash["a2"], @coordinate_hash["a3"]],
-      [@coordinate_hash["b1"], @coordinate_hash["b2"], @coordinate_hash["b3"]],
-      [@coordinate_hash["c1"], @coordinate_hash["c2"], @coordinate_hash["c3"]],
-      [@coordinate_hash["a1"], @coordinate_hash["b2"], @coordinate_hash["c3"]],
-      [@coordinate_hash["c1"], @coordinate_hash["b2"], @coordinate_hash["a3"]],
-      [@coordinate_hash["a1"], @coordinate_hash["b1"], @coordinate_hash["c1"]],
-      [@coordinate_hash["a2"], @coordinate_hash["b2"], @coordinate_hash["c2"]],
-      [@coordinate_hash["a3"], @coordinate_hash["b3"], @coordinate_hash["c3"]]
+      [@board_hash["a1"], @board_hash["a2"], @board_hash["a3"]],
+      [@board_hash["b1"], @board_hash["b2"], @board_hash["b3"]],
+      [@board_hash["c1"], @board_hash["c2"], @board_hash["c3"]],
+      [@board_hash["a1"], @board_hash["b2"], @board_hash["c3"]],
+      [@board_hash["c1"], @board_hash["b2"], @board_hash["a3"]],
+      [@board_hash["a1"], @board_hash["b1"], @board_hash["c1"]],
+      [@board_hash["a2"], @board_hash["b2"], @board_hash["c2"]],
+      [@board_hash["a3"], @board_hash["b3"], @board_hash["c3"]]
     ]
     winner = [false, 0]
-    win_array.each do |item|
-      if item == ["[#{mark}]"]*3
+    win_array.each do |row|
+      if row == ["[#{mark}]"]*3
         winner[0] = true
         winner[1] = mark
       end
@@ -52,9 +52,8 @@ class Board
 end
 
 class Player
-  attr_accessor :name, :mark
-  def initialize(name, mark)
-    @name = name
+  attr_accessor :mark
+  def initialize(mark)
     @mark = mark
   end
 
@@ -72,10 +71,10 @@ class Game
 
   def start_game
     @round_1 = Board.new
-    @round_1.generate_board 
+    @round_1.display_board 
     
-    @player_1 = Player.new("joe", "X")
-    @player_2 = Player.new("bob", "O")
+    @player_1 = Player.new("X")
+    @player_2 = Player.new("O")
   end
 
   def play_round
@@ -99,7 +98,7 @@ class Game
       players_move = player.make_a_move
       move_confirm = @round_1.move_made(players_move, player.mark)
       if move_confirm == true
-        @round_1.generate_board
+        @round_1.display_board
         winner = @round_1.winner_check(player.mark)
         return winner
       else 
@@ -109,6 +108,6 @@ class Game
   end
 end
 
-game1 = Game.new
-game1.start_game
-game1.play_round
+# game1 = Game.new
+# game1.start_game
+# game1.play_round
