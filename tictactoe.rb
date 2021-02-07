@@ -1,6 +1,5 @@
 
 class Board
-  attr_accessor :board_hash
   def initialize
     @board_hash = {
     "a1" => "[ ]", "a2" => "[ ]", "a3" => "[ ]",
@@ -29,7 +28,7 @@ class Board
     end
   end
 
-  def winner_check(mark)
+  def winner_check(player)
     win_array = [
       [@board_hash["a1"], @board_hash["a2"], @board_hash["a3"]],
       [@board_hash["b1"], @board_hash["b2"], @board_hash["b3"]],
@@ -40,15 +39,12 @@ class Board
       [@board_hash["a2"], @board_hash["b2"], @board_hash["c2"]],
       [@board_hash["a3"], @board_hash["b3"], @board_hash["c3"]]
     ]
-    winner = [false, 0]
     win_array.each do |row|
-      if row == ["[#{mark}]"]*3
-        winner[0] = true
-        winner[1] = mark
-      end
+      return player if row == ["[#{player.mark}]"]*3
     end
-    return winner
+    false
   end
+
 end
 
 class Player
@@ -60,18 +56,13 @@ class Player
   def make_a_move
     puts "Where do you want to put your #{@mark}?"
     player_coordinate = gets.chomp
-    return player_coordinate
   end
+
 end
 
 class Game
   def initialize
-    @game_name = "round 1"
-  end
-
-  def start_game
     @round_1 = Board.new
-    @round_1.display_board 
     
     @player_1 = Player.new("X")
     @player_2 = Player.new("O")
@@ -79,35 +70,48 @@ class Game
 
   def play_round
     is_player_1_turn = true
-    winner = [false, 0]
-    while winner[0] == false 
+    winner = false
+
+    while !winner
+      @round_1.display_board
       if is_player_1_turn
         is_player_1_turn = false
-        winner = player_move(@player_1)
+        player = @player_1
       else
         is_player_1_turn = true
-        winner = player_move(@player_2)
+        player = @player_2
       end
+
+      player_mover(player)
+      winner = player_winner(player)
     end
-    puts "#{winner[1]} is the winner!" 
+  end
+  
+  private 
+
+  def player_mover(player)
+    move_ok = false
+    while move_ok == false
+      players_move = player.make_a_move
+      move_ok = @round_1.move_made(players_move, player.mark)
+      puts "Incorrect move: try again" if move_ok == false
+    end
   end
 
-  def player_move(player)
-    move_confirm = false
-    while move_confirm == false
-      players_move = player.make_a_move
-      move_confirm = @round_1.move_made(players_move, player.mark)
-      if move_confirm == true
-        @round_1.display_board
-        winner = @round_1.winner_check(player.mark)
-        return winner
-      else 
-        puts "Incorrect move: try again"
-      end
-    end
+  def player_winner(player)
+    winner = @round_1.winner_check(player)
+    return false if !winner
+    game_over(player)
+    true    
   end
+
+  def game_over(player)
+    @round_1.display_board
+    puts "#{player.mark} is the winner!"
+  end
+  
 end
 
 # game1 = Game.new
-# game1.start_game
+
 # game1.play_round
